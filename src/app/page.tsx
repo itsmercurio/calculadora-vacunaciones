@@ -354,19 +354,20 @@ export default function Home() {
 
   return (
     <main
-      className={`mx-auto flex min-h-screen w-full max-w-4xl items-start justify-center px-4 py-6 ${
+      className={`min-h-screen w-full ${
         isDark
           ? "bg-slate-950 text-slate-100"
           : "bg-gradient-to-b from-slate-100 to-slate-200 text-slate-900"
       }`}
     >
-      <section
-        className={`w-full rounded-3xl border p-5 shadow-xl ${
-          isDark
-            ? "border-slate-700 bg-slate-900/95 shadow-black/30"
-            : "border-slate-200 bg-white/95 shadow-sky-100/70"
-        }`}
-      >
+      <div className="mx-auto flex w-full max-w-4xl items-start justify-center px-4 py-6">
+        <section
+          className={`w-full rounded-3xl border p-5 shadow-xl ${
+            isDark
+              ? "border-slate-700 bg-slate-900/95 shadow-black/30"
+              : "border-slate-200 bg-white/95 shadow-sky-100/70"
+          }`}
+        >
         <div className="flex items-center justify-between gap-3">
           <h1 className={`text-3xl font-semibold tracking-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>
             Calculadora de Vacunaciones
@@ -627,7 +628,8 @@ export default function Home() {
             )}
           </div>
         )}
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
