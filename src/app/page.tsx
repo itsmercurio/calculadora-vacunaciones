@@ -274,11 +274,34 @@ export default function Home() {
   const [errorText, setErrorText] = useState<string | null>(null);
 
   const selectedMedicationCard = getMedicationCardByName(medicationName);
+  const isDark = theme === "dark";
+  const riskBadge =
+    selectedMedicationCard?.nivelRiesgo === "rojo"
+      ? {
+          text: "🔴 CRITICO",
+          classes: isDark
+            ? "bg-rose-900/60 text-rose-100 border border-rose-500/70"
+            : "bg-rose-100 text-rose-800 border border-rose-300",
+        }
+      : selectedMedicationCard?.nivelRiesgo === "amarillo"
+        ? {
+            text: "🟡 PRECAUCION",
+            classes: isDark
+              ? "bg-amber-900/60 text-amber-100 border border-amber-500/70"
+              : "bg-amber-100 text-amber-800 border border-amber-300",
+          }
+        : selectedMedicationCard
+          ? {
+              text: "🟢 NORMAL",
+              classes: isDark
+                ? "bg-emerald-900/60 text-emerald-100 border border-emerald-500/70"
+                : "bg-emerald-100 text-emerald-800 border border-emerald-300",
+            }
+          : null;
   const referenceBottleOptions =
     selectedMedicationCard && selectedMedicationCard.tamanos.length > 0
       ? selectedMedicationCard.tamanos
       : [50, 100, 200, 250];
-  const isDark = theme === "dark";
 
   useEffect(() => {
     window.localStorage.setItem(THEME_KEY, theme);
@@ -373,26 +396,26 @@ export default function Home() {
     <main
       className={`min-h-screen w-full ${
         isDark
-          ? "bg-slate-950 text-slate-100"
-          : "bg-gradient-to-b from-slate-100 to-slate-200 text-slate-900"
+          ? "bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100"
+          : "bg-gradient-to-b from-sky-50 via-slate-100 to-slate-200 text-slate-900"
       }`}
     >
       <div className="mx-auto flex w-full max-w-4xl items-start justify-center px-4 py-6">
         <section
-          className={`w-full rounded-3xl border p-5 shadow-xl ${
+          className={`w-full rounded-3xl border p-5 shadow-xl transition-colors ${
             isDark
               ? "border-slate-700 bg-slate-900/95 shadow-black/30"
               : "border-slate-200 bg-white/95 shadow-sky-100/70"
           }`}
         >
         <div className="flex items-center justify-between gap-3">
-          <h1 className={`text-3xl font-semibold tracking-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+          <h1 className={`text-4xl font-bold tracking-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>
             Calculadora de Vacunaciones
           </h1>
           <button
             type="button"
             onClick={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
-            className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+            className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-transform duration-150 hover:-translate-y-0.5 active:scale-95 ${
               isDark
                 ? "border-slate-600 bg-slate-800 text-slate-100"
                 : "border-slate-300 bg-white text-slate-800"
@@ -405,11 +428,11 @@ export default function Home() {
           Flujo real en campo: plazas + cm indicados + medicamento.
         </p>
 
-        <div className={`mt-5 grid grid-cols-2 gap-2 rounded-2xl p-1 ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
+        <div className={`mt-5 grid grid-cols-2 gap-2 rounded-2xl p-1 ${isDark ? "bg-slate-800/90" : "bg-slate-100"}`}>
           <button
             type="button"
             onClick={() => setActiveTab("calculadora")}
-            className={`h-11 rounded-xl text-sm font-semibold ${
+            className={`h-11 rounded-xl text-sm font-semibold transition-all hover:-translate-y-0.5 active:scale-95 ${
               activeTab === "calculadora"
                 ? isDark
                   ? "bg-slate-700 text-slate-100 shadow"
@@ -424,7 +447,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setActiveTab("informacion")}
-            className={`h-11 rounded-xl text-sm font-semibold ${
+            className={`h-11 rounded-xl text-sm font-semibold transition-all hover:-translate-y-0.5 active:scale-95 ${
               activeTab === "informacion"
                 ? isDark
                   ? "bg-slate-700 text-slate-100 shadow"
@@ -439,7 +462,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setActiveTab("info-medicamento")}
-            className={`col-span-2 h-11 rounded-xl text-sm font-semibold ${
+            className={`col-span-2 h-11 rounded-xl text-sm font-semibold transition-all hover:-translate-y-0.5 active:scale-95 ${
               activeTab === "info-medicamento"
                 ? isDark
                   ? "bg-slate-700 text-slate-100 shadow"
@@ -457,23 +480,23 @@ export default function Home() {
           <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
             <form className="space-y-4" onSubmit={handleCalculate}>
               <label className="block">
-                <span className="mb-1 block text-sm font-medium text-slate-700">Numero de plazas</span>
+                <span className={`mb-1 block text-sm font-semibold ${isDark ? "text-slate-200" : "text-slate-700"}`}>Numero de plazas</span>
                 <input
                   type="number"
                   min={1}
                   required
                   value={numberOfBooths}
                   onChange={(e) => setNumberOfBooths(e.target.value)}
-                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none ${
+                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none transition-all ${
                     isDark
                       ? "border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400"
                       : "border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-500"
-                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-200`}
+                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-400/50`}
                 />
               </label>
 
               <label className="block">
-                <span className="mb-1 block text-sm font-medium text-slate-700">Centimetros a aplicar (pistola)</span>
+                <span className={`mb-1 block text-sm font-semibold ${isDark ? "text-slate-200" : "text-slate-700"}`}>Centimetros a aplicar (pistola)</span>
                 <input
                   type="number"
                   min={0.1}
@@ -481,25 +504,25 @@ export default function Home() {
                   required
                   value={indicatedCm}
                   onChange={(e) => setIndicatedCm(e.target.value)}
-                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none ${
+                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none transition-all ${
                     isDark
                       ? "border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400"
                       : "border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-500"
-                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-200`}
+                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-400/50`}
                 />
               </label>
 
               <label className="block">
-                <span className="mb-1 block text-sm font-medium text-slate-700">Medicamento</span>
+                <span className={`mb-1 block text-sm font-semibold ${isDark ? "text-slate-200" : "text-slate-700"}`}>Medicamento</span>
                 <select
                   required
                   value={medicationName}
                   onChange={(e) => setMedicationName(e.target.value)}
-                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none ${
+                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none transition-all ${
                     isDark
                       ? "border-slate-600 bg-slate-800 text-slate-100"
                       : "border-slate-300 bg-slate-50 text-slate-900"
-                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-200`}
+                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-400/50`}
                 >
                   <option value="">Selecciona un medicamento</option>
                   {MEDICATION_OPTIONS.map((opt) => (
@@ -511,16 +534,16 @@ export default function Home() {
               </label>
 
               <label className="block">
-                <span className="mb-1 block text-sm font-medium text-slate-700">Referencia de bote (ml)</span>
+                <span className={`mb-1 block text-sm font-semibold ${isDark ? "text-slate-200" : "text-slate-700"}`}>Referencia de bote (ml)</span>
                 <select
                   required
                   value={referenceBottleMl}
                   onChange={(e) => setReferenceBottleMl(e.target.value)}
-                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none ${
+                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none transition-all ${
                     isDark
                       ? "border-slate-600 bg-slate-800 text-slate-100"
                       : "border-slate-300 bg-slate-50 text-slate-900"
-                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-200`}
+                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-400/50`}
                 >
                   <option value="">Selecciona referencia</option>
                   {referenceBottleOptions.map((size) => (
@@ -531,6 +554,12 @@ export default function Home() {
                 </select>
               </label>
 
+              {riskBadge && (
+                <div className={`inline-flex rounded-full px-3 py-1 text-xs font-bold tracking-wide ${riskBadge.classes}`}>
+                  {riskBadge.text}
+                </div>
+              )}
+
               {selectedMedicationCard?.advertencia && (
                 <p className="rounded-xl border-2 border-rose-500 bg-rose-100 px-4 py-3 text-center text-base font-extrabold text-rose-800">
                   ALERTA: {selectedMedicationCard.advertencia}
@@ -538,11 +567,15 @@ export default function Home() {
               )}
 
               {riskText && (
-                <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700">{riskText}</p>
+                <p className={`rounded-xl border px-4 py-2 text-sm ${
+                  isDark ? "border-sky-700 bg-sky-950/50 text-sky-100" : "border-sky-200 bg-sky-50 text-sky-800"
+                }`}>{riskText}</p>
               )}
 
               {selectedMedicationCard && (
-                <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700">
+                <p className={`rounded-xl border px-4 py-2 text-sm ${
+                  isDark ? "border-slate-700 bg-slate-800/70 text-slate-200" : "border-slate-200 bg-slate-50 text-slate-700"
+                }`}>
                   Suero: {selectedMedicationCard.permiteSuero ? "permitido segun criterio" : "no permitido"}
                 </p>
               )}
@@ -552,30 +585,40 @@ export default function Home() {
               )}
 
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <button type="submit" className="h-16 rounded-2xl bg-sky-600 text-xl font-semibold text-white hover:bg-sky-700">
+                <button type="submit" className="h-16 rounded-2xl bg-sky-600 text-xl font-semibold text-white transition-all duration-150 hover:-translate-y-0.5 hover:bg-sky-700 hover:shadow-lg hover:shadow-sky-500/30 active:scale-95">
                   Calcular
                 </button>
-                <button type="button" onClick={handleClear} className="h-16 rounded-2xl border border-slate-300 bg-white text-lg font-semibold text-slate-700">
+                <button type="button" onClick={handleClear} className={`h-16 rounded-2xl border text-lg font-semibold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+                  isDark ? "border-slate-600 bg-slate-800 text-slate-100 hover:bg-slate-700" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                }`}>
                   Limpiar
                 </button>
               </div>
 
               {result && (
                 <div className="space-y-3">
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-sm font-semibold text-slate-800">Resultado final</p>
+                  <div className={`rounded-2xl border p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+                    isDark ? "border-blue-700/40 bg-blue-950/40 hover:shadow-blue-900/40" : "border-blue-200 bg-blue-50/80 hover:shadow-blue-200/70"
+                  }`}>
+                    <p className={`text-base font-bold ${isDark ? "text-blue-100" : "text-blue-900"}`}>Resultado final</p>
                     <div className="mt-2 grid gap-2 sm:grid-cols-3">
-                      <article className="rounded-xl bg-white p-3">
+                      <article className={`rounded-xl p-3 transition-all hover:shadow ${
+                        isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
+                      }`}>
                         <p className="text-xs text-slate-500">ml por cerdo</p>
-                        <p className="text-lg font-semibold text-slate-900">{result.mlPorCerdo.toFixed(2)}</p>
+                        <p className="text-2xl font-bold">{result.mlPorCerdo.toFixed(2)}</p>
                       </article>
-                      <article className="rounded-xl bg-white p-3">
+                      <article className={`rounded-xl p-3 transition-all hover:shadow ${
+                        isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
+                      }`}>
                         <p className="text-xs text-slate-500">cerdos por bote</p>
-                        <p className="text-lg font-semibold text-slate-900">{result.cerdosPorBote.toFixed(2)}</p>
+                        <p className="text-2xl font-bold">{result.cerdosPorBote.toFixed(2)}</p>
                       </article>
-                      <article className="rounded-xl bg-white p-3">
+                      <article className={`rounded-xl p-3 transition-all hover:shadow ${
+                        isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
+                      }`}>
                         <p className="text-xs text-slate-500">botes necesarios</p>
-                        <p className="text-lg font-semibold text-slate-900">{result.botesNecesarios}</p>
+                        <p className="text-2xl font-bold">{result.botesNecesarios}</p>
                       </article>
                     </div>
                     <p className="mt-2 text-xs text-slate-600">
@@ -590,14 +633,18 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className={`rounded-2xl border p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+                    isDark ? "border-slate-700 bg-slate-900/60 hover:shadow-slate-900/40" : "border-slate-200 bg-slate-50 hover:shadow-slate-200/70"
+                  }`}>
                     <p className="text-sm font-semibold text-slate-800">Botes necesarios por tamano</p>
                     {result.bottleCounts.length === 0 ? (
                       <p className="mt-2 text-sm text-slate-600">Segun formato comercial del producto.</p>
                     ) : (
                       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
                         {result.bottleCounts.map((item) => (
-                          <article key={item.size} className="rounded-xl bg-white p-3 text-center">
+                          <article key={item.size} className={`rounded-xl p-3 text-center transition-all hover:shadow ${
+                            isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-900"
+                          }`}>
                             <p className="text-xs text-slate-500">{item.size} ml</p>
                             <p className="text-[11px] text-slate-500">{item.pigsPerBottle.toFixed(2)} cerdos/bote</p>
                             <p className="text-xl font-semibold text-slate-900">{item.count}</p>
