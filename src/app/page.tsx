@@ -40,6 +40,7 @@ type LastCalculation = {
   medicationName: string;
   numberOfBooths: string;
   indicatedCm: string;
+  referenceBottleMl: string;
   result: CalculationResult;
 };
 
@@ -266,10 +267,17 @@ export default function Home() {
   const [numberOfBooths, setNumberOfBooths] = useState(initial?.numberOfBooths ?? "");
   const [indicatedCm, setIndicatedCm] = useState(initial?.indicatedCm ?? "");
   const [medicationName, setMedicationName] = useState(initial?.medicationName ?? "");
+  const [referenceBottleMl, setReferenceBottleMl] = useState(
+    initial?.referenceBottleMl ?? "",
+  );
   const [result, setResult] = useState<CalculationResult | null>(initial?.result ?? null);
   const [errorText, setErrorText] = useState<string | null>(null);
 
   const selectedMedicationCard = getMedicationCardByName(medicationName);
+  const referenceBottleOptions =
+    selectedMedicationCard && selectedMedicationCard.tamanos.length > 0
+      ? selectedMedicationCard.tamanos
+      : [50, 100, 200, 250];
   const isDark = theme === "dark";
 
   useEffect(() => {
@@ -280,14 +288,21 @@ export default function Home() {
     event.preventDefault();
     setErrorText(null);
 
-    if (!numberOfBooths || !indicatedCm || !medicationName || !selectedMedicationCard) {
+    if (
+      !numberOfBooths ||
+      !indicatedCm ||
+      !medicationName ||
+      !selectedMedicationCard ||
+      !referenceBottleMl
+    ) {
       setErrorText("Completa todos los campos.");
       return;
     }
 
     const plazas = Number(numberOfBooths);
     const cmIndicados = Number(indicatedCm);
-    if (plazas <= 0 || cmIndicados <= 0) {
+    const bottleReference = Number(referenceBottleMl);
+    if (plazas <= 0 || cmIndicados <= 0 || bottleReference <= 0) {
       setErrorText("Introduce valores validos y mayores que cero.");
       return;
     }
@@ -296,8 +311,8 @@ export default function Home() {
     const mlPorCerdo = cmIndicados;
     const totalMl = plazas * mlPorCerdo;
     const availableSizes =
-      selectedMedicationCard.tamanos.length > 0 ? selectedMedicationCard.tamanos : [250];
-    const tamanoBotePrincipal = availableSizes[0];
+      selectedMedicationCard.tamanos.length > 0 ? selectedMedicationCard.tamanos : [50, 100, 200, 250];
+    const tamanoBotePrincipal = bottleReference;
     const cerdosPorBote = tamanoBotePrincipal / cmIndicados;
     const botesNecesarios = Math.ceil(plazas / cerdosPorBote);
 
@@ -329,6 +344,7 @@ export default function Home() {
       medicationName,
       numberOfBooths,
       indicatedCm,
+      referenceBottleMl,
       result: nextResult,
     };
     window.localStorage.setItem(LAST_CALCULATION_KEY, JSON.stringify(payload));
@@ -338,6 +354,7 @@ export default function Home() {
     setNumberOfBooths("");
     setIndicatedCm("");
     setMedicationName("");
+    setReferenceBottleMl("");
     setResult(null);
     setErrorText(null);
     window.localStorage.removeItem(LAST_CALCULATION_KEY);
@@ -488,6 +505,27 @@ export default function Home() {
                   {MEDICATION_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block">
+                <span className="mb-1 block text-sm font-medium text-slate-700">Referencia de bote (ml)</span>
+                <select
+                  required
+                  value={referenceBottleMl}
+                  onChange={(e) => setReferenceBottleMl(e.target.value)}
+                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none ${
+                    isDark
+                      ? "border-slate-600 bg-slate-800 text-slate-100"
+                      : "border-slate-300 bg-slate-50 text-slate-900"
+                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-200`}
+                >
+                  <option value="">Selecciona referencia</option>
+                  {referenceBottleOptions.map((size) => (
+                    <option key={size} value={size}>
+                      {size} ml
                     </option>
                   ))}
                 </select>
