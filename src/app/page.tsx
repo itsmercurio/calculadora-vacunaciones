@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const LAST_CALCULATION_KEY = "calculadora-vacunaciones:last-calculation";
+const THEME_KEY = "calculadora-vacunaciones:theme";
 
 type MedicationType = "vacuna" | "antibiotico" | "especial";
 type RiskLevel = "verde" | "amarillo" | "rojo";
@@ -254,6 +255,12 @@ function getInitialLastCalculation(): LastCalculation | null {
 }
 
 export default function Home() {
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") return "light";
+    const savedTheme = window.localStorage.getItem(THEME_KEY);
+    if (savedTheme === "dark" || savedTheme === "light") return savedTheme;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
   const [activeTab, setActiveTab] = useState<AppTab>("calculadora");
   const [initial] = useState<LastCalculation | null>(() => getInitialLastCalculation());
   const [numberOfBooths, setNumberOfBooths] = useState(initial?.numberOfBooths ?? "");
@@ -263,6 +270,11 @@ export default function Home() {
   const [errorText, setErrorText] = useState<string | null>(null);
 
   const selectedMedicationCard = getMedicationCardByName(medicationName);
+  const isDark = theme === "dark";
+
+  useEffect(() => {
+    window.localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
 
   const handleCalculate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -341,34 +353,83 @@ export default function Home() {
           : null;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-4xl items-start justify-center px-4 py-6">
-      <section className="w-full rounded-3xl border border-white/50 bg-white/90 p-5 shadow-xl shadow-sky-100/70">
-        <h1 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
-          Calculadora de Vacunaciones
-        </h1>
-        <p className="mt-2 text-center text-sm text-slate-600">
+    <main
+      className={`mx-auto flex min-h-screen w-full max-w-4xl items-start justify-center px-4 py-6 ${
+        isDark
+          ? "bg-slate-950 text-slate-100"
+          : "bg-gradient-to-b from-slate-100 to-slate-200 text-slate-900"
+      }`}
+    >
+      <section
+        className={`w-full rounded-3xl border p-5 shadow-xl ${
+          isDark
+            ? "border-slate-700 bg-slate-900/95 shadow-black/30"
+            : "border-slate-200 bg-white/95 shadow-sky-100/70"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <h1 className={`text-3xl font-semibold tracking-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+            Calculadora de Vacunaciones
+          </h1>
+          <button
+            type="button"
+            onClick={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
+            className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+              isDark
+                ? "border-slate-600 bg-slate-800 text-slate-100"
+                : "border-slate-300 bg-white text-slate-800"
+            }`}
+          >
+            {isDark ? "Modo claro" : "Modo oscuro"}
+          </button>
+        </div>
+        <p className={`mt-2 text-sm ${isDark ? "text-slate-300" : "text-slate-600"}`}>
           Flujo real en campo: plazas + cm indicados + medicamento.
         </p>
 
-        <div className="mt-5 grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
+        <div className={`mt-5 grid grid-cols-2 gap-2 rounded-2xl p-1 ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
           <button
             type="button"
             onClick={() => setActiveTab("calculadora")}
-            className={`h-11 rounded-xl text-sm font-semibold ${activeTab === "calculadora" ? "bg-white text-slate-900 shadow" : "text-slate-600"}`}
+            className={`h-11 rounded-xl text-sm font-semibold ${
+              activeTab === "calculadora"
+                ? isDark
+                  ? "bg-slate-700 text-slate-100 shadow"
+                  : "bg-white text-slate-900 shadow"
+                : isDark
+                  ? "text-slate-300"
+                  : "text-slate-600"
+            }`}
           >
             Calculadora
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("informacion")}
-            className={`h-11 rounded-xl text-sm font-semibold ${activeTab === "informacion" ? "bg-white text-slate-900 shadow" : "text-slate-600"}`}
+            className={`h-11 rounded-xl text-sm font-semibold ${
+              activeTab === "informacion"
+                ? isDark
+                  ? "bg-slate-700 text-slate-100 shadow"
+                  : "bg-white text-slate-900 shadow"
+                : isDark
+                  ? "text-slate-300"
+                  : "text-slate-600"
+            }`}
           >
             Informacion
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("info-medicamento")}
-            className={`col-span-2 h-11 rounded-xl text-sm font-semibold ${activeTab === "info-medicamento" ? "bg-white text-slate-900 shadow" : "text-slate-600"}`}
+            className={`col-span-2 h-11 rounded-xl text-sm font-semibold ${
+              activeTab === "info-medicamento"
+                ? isDark
+                  ? "bg-slate-700 text-slate-100 shadow"
+                  : "bg-white text-slate-900 shadow"
+                : isDark
+                  ? "text-slate-300"
+                  : "text-slate-600"
+            }`}
           >
             Informacion del medicamento
           </button>
@@ -385,7 +446,11 @@ export default function Home() {
                   required
                   value={numberOfBooths}
                   onChange={(e) => setNumberOfBooths(e.target.value)}
-                  className="h-14 w-full rounded-2xl border border-slate-200 px-4 text-base outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none ${
+                    isDark
+                      ? "border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400"
+                      : "border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-500"
+                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-200`}
                 />
               </label>
 
@@ -398,7 +463,11 @@ export default function Home() {
                   required
                   value={indicatedCm}
                   onChange={(e) => setIndicatedCm(e.target.value)}
-                  className="h-14 w-full rounded-2xl border border-slate-200 px-4 text-base outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none ${
+                    isDark
+                      ? "border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400"
+                      : "border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-500"
+                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-200`}
                 />
               </label>
 
@@ -408,7 +477,11 @@ export default function Home() {
                   required
                   value={medicationName}
                   onChange={(e) => setMedicationName(e.target.value)}
-                  className="h-14 w-full rounded-2xl border border-slate-200 px-4 text-base outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                  className={`h-14 w-full rounded-2xl border px-4 text-base outline-none ${
+                    isDark
+                      ? "border-slate-600 bg-slate-800 text-slate-100"
+                      : "border-slate-300 bg-slate-50 text-slate-900"
+                  } focus:border-sky-500 focus:ring-2 focus:ring-sky-200`}
                 >
                   <option value="">Selecciona un medicamento</option>
                   {MEDICATION_OPTIONS.map((opt) => (
