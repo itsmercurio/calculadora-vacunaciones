@@ -266,9 +266,9 @@ function safeCeilDivision(total: number, size: number) {
   return Math.ceil(total / size - 1e-9);
 }
 
-function getMedicationCardByName(name: string) {
+function getMedicationCardByName(name: string): MedicationCard | null {
   if (!name) return null;
-  return MEDICATION_CARDS[name as MedicationKey] ?? null;
+  return (MEDICATION_CARDS[name as MedicationKey] as MedicationCard | undefined) ?? null;
 }
 
 function getBottleSizesForMedication(name: string): number[] {
@@ -1035,7 +1035,8 @@ export default function Home() {
           <div className="mt-8 space-y-3">
             {Object.entries(MEDICATION_CARDS)
               .filter(([key]) => key !== "manual")
-              .map(([key, ficha]) => {
+              .map(([key, rawFicha]) => {
+                const ficha = rawFicha as MedicationCard;
                 const riskStyles =
                   ficha.nivelRiesgo === "rojo"
                     ? "border-rose-300 bg-rose-50"
